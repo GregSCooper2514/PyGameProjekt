@@ -1,4 +1,5 @@
 import random, pygame
+from pygame.constants import K_x
 class Cell:
     def __init__(self):
         self.is_bomb = False
@@ -8,6 +9,11 @@ class Cell:
         self.number = 0
         self.x = -1
         self.y = -1
+        self.a = -1
+        self.b = -1
+
+    def explosion(self):
+        pass
 
     def check_bomb(self):
         return self.is_bomb
@@ -27,6 +33,18 @@ class Cell:
     def set_y(self, y):
         self.y = y
 
+    def set_a(self, a):
+        self.a = a
+
+    def set_b(self, b):
+        self.b = b
+
+    def get_a(self):
+        return self.a
+
+    def get_b(self):
+        return self.b
+
     def get_y(self):
         return self.y
 
@@ -35,10 +53,10 @@ class Cell:
 
     def get_number(self):
         return self.number
-    
+
     def get_open(self):
         return self.is_open
-    
+
     def set_open(self):
         self.is_open = True
 
@@ -47,9 +65,9 @@ class Board:
         self.width = width
         self.hight = hight
         self.bombs = bombs
-        self.cell_size = 50
+        self.cell_size = 20
         self.beggining = beggining
-        self.font = pygame.font.SysFont('Arial', 40)
+        self.font = pygame.font.SysFont('Arial', 10)
         lisst = []
         for a in range(self.width):
             lisst1 = []
@@ -71,21 +89,29 @@ class Board:
                 bombs -= 1
         for a in range(self.width):
             for b in range(self.hight):
+                self.list_of_cells[a][b].set_a(a)
+                self.list_of_cells[a][b].set_b(b)
                 self.list_of_cells[a][b].set_x(self.cell_size * a)
                 self.list_of_cells[a][b].set_y(self.beggining + (self.cell_size * b))
-    
-    def explosion(self):
-        pass
+
+    def open_area(self, a, b):
+        self.list_of_cells[a][b].set_open()
+        if self.list_of_cells[a][b].get_number() > 0:
+            return
+        for i in self.get_near_cells(a, b):
+            self.open_area(i.get_a(), i.get_b())
+
 
     def left_mouse_click(self, pos):
         a = pos[0] // self.cell_size
         b = (pos[1] - self.beggining) // self.cell_size
-        if self.list_of_cells[a][b].check_bomb()
-            self.explosion()
-        else:
-            
-        self.list_of_cells[a][b].set_open()
-
+        if not self.list_of_cells[a][b].get_open():
+            if self.list_of_cells[a][b].check_bomb():
+                for i in self.list_of_cells:
+                    for j in i:
+                        j.explosion()
+            else:
+                self.open_area(a, b)
 
     def render(self, screen):
         for a in self.list_of_cells:
@@ -98,7 +124,7 @@ class Board:
                     else:
                         pygame.draw.rect(screen, "gray", (b.get_x(), b.get_y(), self.cell_size, self.cell_size))
                     if b.get_number() > 0:
-                        screen.blit(self.font.render(str(b.get_number()), True, (255,255,0)), (b.get_x(), b.get_y()))
+                        screen.blit(self.font.render(str(b.get_number()), True, "black"), (b.get_x(), b.get_y()))
 
     def check_value(self, x, y):
         if x >= 0 and x <= self.width - 1 and y >= 0 and y <= self.hight - 1:
@@ -141,7 +167,7 @@ if __name__ == '__main__':
     pygame.init()
     size = width, height = 500, 500
     screen = pygame.display.set_mode(size)
-    board = Board(5, 7, 10, 5)
+    board = Board(16, 30, 99, 5)
     #board.set_view(100, 100, 50)
     running = True
     while running:
@@ -149,7 +175,7 @@ if __name__ == '__main__':
             if event.type == pygame.QUIT:
                 running = False
             if event.type == pygame.MOUSEBUTTONDOWN:
-                
+                board.left_mouse_click(event.pos)
         screen.fill("black")
         board.render(screen)
         pygame.display.flip()
