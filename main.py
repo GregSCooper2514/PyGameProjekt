@@ -1,5 +1,6 @@
 import random, pygame
-from pygame.constants import K_x
+
+
 class Cell:
     def __init__(self):
         self.is_bomb = False
@@ -60,12 +61,13 @@ class Cell:
     def set_open(self):
         self.is_open = True
 
+
 class Board:
     def __init__(self, width, hight, bombs, beggining):
         self.width = width
         self.hight = hight
         self.bombs = bombs
-        self.cell_size = 20
+        self.cell_size = 17
         self.beggining = beggining
         self.font = pygame.font.SysFont('Arial', 10)
         lisst = []
@@ -95,12 +97,13 @@ class Board:
                 self.list_of_cells[a][b].set_y(self.beggining + (self.cell_size * b))
 
     def open_area(self, a, b):
+        if self.list_of_cells[a][b].get_open():
+            return
         self.list_of_cells[a][b].set_open()
         if self.list_of_cells[a][b].get_number() > 0:
             return
         for i in self.get_near_cells(a, b):
             self.open_area(i.get_a(), i.get_b())
-
 
     def left_mouse_click(self, pos):
         a = pos[0] // self.cell_size
@@ -120,11 +123,15 @@ class Board:
                     pygame.draw.rect(screen, "red", (b.get_x(), b.get_y(), self.cell_size, self.cell_size))
                 else:
                     if b.get_open():
-                        pygame.draw.rect(screen, "white", (b.get_x(), b.get_y(), self.cell_size, self.cell_size))
+                        pygame.draw.rect(screen, "white", (b.get_x(), b.get_y(), self.cell_size, self.cell_size), 0)
+                        for i in range(4):
+                            pygame.draw.rect(screen, (193, 193, 193), (b.get_x() - i, b.get_y() - i, self.cell_size + 1, self.cell_size + 1), 1)
+                        if b.get_number() > 0:
+                            screen.blit(self.font.render(str(b.get_number()), True, "black"), (b.get_x(), b.get_y()))
                     else:
-                        pygame.draw.rect(screen, "gray", (b.get_x(), b.get_y(), self.cell_size, self.cell_size))
-                    if b.get_number() > 0:
-                        screen.blit(self.font.render(str(b.get_number()), True, "black"), (b.get_x(), b.get_y()))
+                        pygame.draw.rect(screen, (126, 126, 126), (b.get_x(), b.get_y(), self.cell_size, self.cell_size), 0)
+                        for i in range(4):
+                            pygame.draw.rect(screen, (193, 193, 193), (b.get_x() - i, b.get_y() - i, self.cell_size + 1, self.cell_size + 1), 1)
 
     def check_value(self, x, y):
         if x >= 0 and x <= self.width - 1 and y >= 0 and y <= self.hight - 1:
@@ -163,12 +170,12 @@ class Board:
                 lisst.append(self.list_of_cells[x][y])
         return lisst
 
+
 if __name__ == '__main__':
     pygame.init()
-    size = width, height = 500, 500
+    size = width, height = 1000, 1000
     screen = pygame.display.set_mode(size)
     board = Board(16, 30, 99, 5)
-    #board.set_view(100, 100, 50)
     running = True
     while running:
         for event in pygame.event.get():
