@@ -8,22 +8,25 @@ class Cell:
         self.number = 0
         self.x = -1
         self.y = -1
-    
+
     def check_bomb(self):
         return self.is_bomb
-    
+
     def set_bomb(self):
         self.is_bomb = True
-    
+
     def set_number(self, number):
         self.number = number
-    
+
+    def add_number(self):
+        self.number += 1
+
     def set_x(self, x):
         self.x = x
-    
+
     def set_y(self, y):
         self.y = y
-    
+
     def get_y(self):
         return self.y
 
@@ -54,9 +57,10 @@ class Board:
         while bombs > 0:
             random_hight = random.randrange(self.hight)
             random_width = random.randrange(self.width)
-            celll = self.list_of_cells[random_width][random_hight]
-            if not celll.check_bomb():
-                celll.set_bomb()
+            if not self.list_of_cells[random_width][random_hight].check_bomb():
+                self.list_of_cells[random_width][random_hight].set_bomb()
+                for a in self.get_near_cells(random_width, random_hight):
+                    a.add_number()
                 bombs -= 1
         for a in range(self.width):
             for b in range(self.hight):
@@ -80,29 +84,29 @@ class Board:
 
     def get_near_cells(self, a, b):
         lisst = []
-        for counter in range(7):
-            if counter = 0:
+        for counter in range(8):
+            if counter == 0:
                 x = a - 1
                 y = b - 1
-            if counter = 1:
+            if counter == 1:
                 x = a
                 y = b - 1
-            if counter = 2:
+            if counter == 2:
                 x = a + 1
                 y = b - 1
-            if counter = 3:
+            if counter == 3:
                 x = a + 1
                 y = b
-            if counter = 4:
+            if counter == 4:
                 x = a + 1
                 y = b + 1
-            if counter = 5:
+            if counter == 5:
                 x = a
                 y = b + 1
-            if counter = 6:
+            if counter == 6:
                 x = a - 1
                 y = b + 1
-            if counter = 7:
+            if counter == 7:
                 x = a - 1
                 y = b
             if self.check_value(x, y):
@@ -113,7 +117,7 @@ if __name__ == '__main__':
     pygame.init()
     size = width, height = 500, 500
     screen = pygame.display.set_mode(size)
-    board = Board(2, 2, 1, 5)
+    board = Board(5, 7, 10, 5)
     #board.set_view(100, 100, 50)
     running = True
     while running:
