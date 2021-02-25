@@ -62,33 +62,6 @@ class Board:
             for b in range(self.hight):
                 self.list_of_cells[a][b].set_x(self.cell_size * a)
                 self.list_of_cells[a][b].set_y(self.beggining + (self.cell_size * b))
-                bombs = 0
-                if self.list_of_cells[a][b].check_bomb():
-                    print("check_bomb", a, b)
-                    continue
-                if self.check_value(a - 1, b - 1):
-                    if self.list_of_cells[a - 1][b - 1].check_bomb(): bombs += 1
-                if self.check_value(a, b - 1):
-                    if self.list_of_cells[a][b - 1].check_bomb(): bombs += 1
-                if self.check_value(a + 1, b - 1):
-                    if self.list_of_cells[a + 1][b - 1].check_bomb(): bombs += 1
-                if self.check_value(a - 1, b):
-                    print("a - 1, b", a, b)
-                    print(bombs)
-                    if self.list_of_cells[a - 1][b].check_bomb(): bombs += 1
-                    print(bombs)
-                if self.check_value(a + 1, b):
-                    print("a + 1, b", a, b)
-                    print(bombs)
-                    if self.list_of_cells[a + 1][b].check_bomb(): bombs += 1
-                    print(bombs)
-                if self.check_value(a - 1, b + 1):
-                    if self.list_of_cells[a - 1][b + 1].check_bomb(): bombs += 1
-                if self.check_value(a, b + 1):
-                    if self.list_of_cells[a][b + 1].check_bomb(): bombs += 1
-                if self.check_value(a + 1, b + 1):
-                    if self.list_of_cells[a + 1][b + 1].check_bomb(): bombs += 1
-            self.list_of_cells[a][b].set_number(bombs)
 
     def render(self, screen):
         for a in self.list_of_cells:
@@ -104,6 +77,37 @@ class Board:
             return True
         else:
             return False
+
+    def get_near_cells(self, a, b):
+        lisst = []
+        for counter in range(7):
+            if counter = 0:
+                x = a - 1
+                y = b - 1
+            if counter = 1:
+                x = a
+                y = b - 1
+            if counter = 2:
+                x = a + 1
+                y = b - 1
+            if counter = 3:
+                x = a + 1
+                y = b
+            if counter = 4:
+                x = a + 1
+                y = b + 1
+            if counter = 5:
+                x = a
+                y = b + 1
+            if counter = 6:
+                x = a - 1
+                y = b + 1
+            if counter = 7:
+                x = a - 1
+                y = b
+            if self.check_value(x, y):
+                lisst.append(self.list_of_cells[x][y])
+        return lisst
 
 if __name__ == '__main__':
     pygame.init()
