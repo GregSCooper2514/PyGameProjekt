@@ -4,7 +4,7 @@ class Cell:
         self.is_bomb = False
         self.is_flag = False
         self.is_qsmark = False
-        self.is_open = True
+        self.is_open = False
         self.number = 0
         self.x = -1
         self.y = -1
@@ -35,6 +35,13 @@ class Cell:
 
     def get_number(self):
         return self.number
+    
+    def get_open(self):
+        return self.is_open
+    
+    def set_open(self):
+        self.is_open = True
+
 class Board:
     def __init__(self, width, hight, bombs, beggining):
         self.width = width
@@ -66,6 +73,19 @@ class Board:
             for b in range(self.hight):
                 self.list_of_cells[a][b].set_x(self.cell_size * a)
                 self.list_of_cells[a][b].set_y(self.beggining + (self.cell_size * b))
+    
+    def explosion(self):
+        pass
+
+    def left_mouse_click(self, pos):
+        a = pos[0] // self.cell_size
+        b = (pos[1] - self.beggining) // self.cell_size
+        if self.list_of_cells[a][b].check_bomb()
+            self.explosion()
+        else:
+            
+        self.list_of_cells[a][b].set_open()
+
 
     def render(self, screen):
         for a in self.list_of_cells:
@@ -73,8 +93,12 @@ class Board:
                 if b.check_bomb():
                     pygame.draw.rect(screen, "red", (b.get_x(), b.get_y(), self.cell_size, self.cell_size))
                 else:
-                    pygame.draw.rect(screen, "gray", (b.get_x(), b.get_y(), self.cell_size, self.cell_size))
-                    screen.blit(self.font.render(str(b.get_number()), True, (255,255,0)), (b.get_x(), b.get_y()))
+                    if b.get_open():
+                        pygame.draw.rect(screen, "white", (b.get_x(), b.get_y(), self.cell_size, self.cell_size))
+                    else:
+                        pygame.draw.rect(screen, "gray", (b.get_x(), b.get_y(), self.cell_size, self.cell_size))
+                    if b.get_number() > 0:
+                        screen.blit(self.font.render(str(b.get_number()), True, (255,255,0)), (b.get_x(), b.get_y()))
 
     def check_value(self, x, y):
         if x >= 0 and x <= self.width - 1 and y >= 0 and y <= self.hight - 1:
@@ -124,6 +148,8 @@ if __name__ == '__main__':
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                
         screen.fill("black")
         board.render(screen)
         pygame.display.flip()
