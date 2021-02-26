@@ -26,7 +26,7 @@ class Cell:
     def explosion(self):
         pass
 
-    def check_bomb(self):
+    def get_bomb(self):
         return self.is_bomb
 
     def set_bomb(self):
@@ -71,11 +71,17 @@ class Cell:
     def set_open(self):
         self.is_open = True
 
-    def set_current(self, par):
-        self.is_current = par
+    def set_current(self):
+        self.is_current = True
 
     def get_current(self):
         return self.is_current
+
+    def get_flag(self):
+        return self.is_flag
+
+    def set_flag(self, par):
+        self.is_flag = par
 
 
 class Board:
@@ -101,7 +107,7 @@ class Board:
         while bombs > 0:
             random_hight = random.randrange(self.hight)
             random_width = random.randrange(self.width)
-            if not self.list_of_cells[random_width][random_hight].check_bomb():
+            if not self.list_of_cells[random_width][random_hight].get_bomb():
                 self.list_of_cells[random_width][random_hight].set_bomb()
                 for a in self.get_near_cells(random_width, random_hight):
                     a.add_number()
@@ -126,16 +132,25 @@ class Board:
         a = pos[0] // self.cell_size
         b = (pos[1] - self.beggining) // self.cell_size
         if not self.list_of_cells[a][b].get_open():
-            if self.list_of_cells[a][b].check_bomb():
-                self.list_of_cells[a][b].set_current(True)
+            if self.list_of_cells[a][b].get_bomb():
+                self.list_of_cells[a][b].set_current()
                 self.is_exploded = True
             else:
                 self.open_area(a, b)
 
+    def right_mouse_click(self, pos):
+        a = pos[0] // self.cell_size
+        b = (pos[1] - self.beggining) // self.cell_size
+        if not self.list_of_cells[a][b].get_open():
+            if self.list_of_cells[a][b].get_flag():
+                self.list_of_cells[a][b].set_flag(False)
+            else:
+                self.list_of_cells[a][b].set_flag(True)
+
     def render(self, screen):
         for a in self.list_of_cells:
             for b in a:
-                if b.check_bomb():
+                if b.get_bomb():
                     if self.is_exploded:
                         if b.get_current():
                             img = pygame.image.load("data\\current_bomb.png")
@@ -163,6 +178,12 @@ class Board:
                         img = pygame.image.load("data\\closed_cell.png")
                         img.convert()
                         screen.blit(img, (b.get_x(), b.get_y()))
+                if b.get_flag() and not self.is_exploded:
+                    img = pygame.image.load("data\\flag.png")
+                    img.convert()
+                    screen.blit(img, (b.get_x(), b.get_y()))
+                if b.get_flag() and not b.get_bomb() and self.is_exploded:
+                    pass #бомба с крестом
 
     def check_value(self, x, y):
         if x >= 0 and x <= self.width - 1 and y >= 0 and y <= self.hight - 1:
@@ -213,7 +234,10 @@ if __name__ == '__main__':
             if event.type == pygame.QUIT:
                 running = False
             if event.type == pygame.MOUSEBUTTONDOWN:
-                board.left_mouse_click(event.pos)
+                if event.button == 1:
+                    board.left_mouse_click(event.pos)
+                if event.button == 3:
+                    board.right_mouse_click(event.pos)
         screen.fill("black")
         board.render(screen)
         pygame.display.flip()
