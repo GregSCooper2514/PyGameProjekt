@@ -1,5 +1,7 @@
-import random, pygame, os
+import random, pygame, os, sys
 os.chdir("C:\\Users\\Greg\\Downloads")
+
+
 def load_image(name, colorkey=None):
     fullname = os.path.join('data', name)
     if not os.path.isfile(fullname):
@@ -7,6 +9,7 @@ def load_image(name, colorkey=None):
         sys.exit()
     image = pygame.image.load(fullname)
     return image
+
 
 class Cell:
     def __init__(self):
@@ -149,7 +152,9 @@ class Board:
                 else:
                     if b.get_open():
                         if b.get_number() > 0:
-                            screen.blit(self.font.render(str(b.get_number()), True, "white"), (b.get_x(), b.get_y()))
+                            img = pygame.image.load(f"data\\number_{b.get_number()}.png")
+                            img.convert()
+                            screen.blit(img, (b.get_x(), b.get_y()))
                         else:
                             img = pygame.image.load("data\\empty_cell.png")
                             img.convert()
