@@ -1,12 +1,19 @@
-import random, pygame
-
+import random, pygame, os
+os.chdir("C:\\Users\\Greg\\Downloads")
+def load_image(name, colorkey=None):
+    fullname = os.path.join('data', name)
+    if not os.path.isfile(fullname):
+        print(f"Файл с изображением '{fullname}' не найден")
+        sys.exit()
+    image = pygame.image.load(fullname)
+    return image
 
 class Cell:
     def __init__(self):
         self.is_bomb = False
         self.is_flag = False
-        self.is_qsmark = False
         self.is_open = False
+        self.is_current = False
         self.number = 0
         self.x = -1
         self.y = -1
@@ -61,14 +68,21 @@ class Cell:
     def set_open(self):
         self.is_open = True
 
+    def set_current(self, par):
+        self.is_current = par
+
+    def get_current(self):
+        return self.is_current
+
 
 class Board:
     def __init__(self, width, hight, bombs, beggining):
         self.width = width
         self.hight = hight
         self.bombs = bombs
-        self.cell_size = 17
+        self.cell_size = 20
         self.beggining = beggining
+        self.is_exploded = False
         self.font = pygame.font.SysFont('Arial', 10)
         lisst = []
         for a in range(self.width):
@@ -110,9 +124,8 @@ class Board:
         b = (pos[1] - self.beggining) // self.cell_size
         if not self.list_of_cells[a][b].get_open():
             if self.list_of_cells[a][b].check_bomb():
-                for i in self.list_of_cells:
-                    for j in i:
-                        j.explosion()
+                self.list_of_cells[a][b].set_current(True)
+                self.is_exploded = True
             else:
                 self.open_area(a, b)
 
@@ -120,7 +133,18 @@ class Board:
         for a in self.list_of_cells:
             for b in a:
                 if b.check_bomb():
-                    pygame.draw.rect(screen, "red", (b.get_x(), b.get_y(), self.cell_size, self.cell_size))
+                    if self.is_exploded:
+                        if b.get_current():
+                            pygame.draw.rect(screen, "red", (b.get_x(), b.get_y(), self.cell_size, self.cell_size))
+                        else:
+                            pygame.draw.rect(screen, "white", (b.get_x(), b.get_y(), self.cell_size, self.cell_size))
+                        img = pygame.image.load('bomb.png')
+                        img.convert()
+                        screen.blit(img, (b.get_x(), b.get_y() + 1))
+                    else:
+                        pygame.draw.rect(screen, (126, 126, 126), (b.get_x(), b.get_y(), self.cell_size, self.cell_size), 0)
+                        for i in range(4):
+                            pygame.draw.rect(screen, (193, 193, 193), (b.get_x() - i, b.get_y() - i, self.cell_size + 1, self.cell_size + 1), 1)
                 else:
                     if b.get_open():
                         pygame.draw.rect(screen, "white", (b.get_x(), b.get_y(), self.cell_size, self.cell_size), 0)
