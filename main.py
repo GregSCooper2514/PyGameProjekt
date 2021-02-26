@@ -135,27 +135,29 @@ class Board:
                 if b.check_bomb():
                     if self.is_exploded:
                         if b.get_current():
-                            pygame.draw.rect(screen, "red", (b.get_x(), b.get_y(), self.cell_size, self.cell_size))
+                            img = pygame.image.load("data\\current_bomb.png")
+                            img.convert()
+                            screen.blit(img, (b.get_x(), b.get_y()))
                         else:
-                            pygame.draw.rect(screen, "white", (b.get_x(), b.get_y(), self.cell_size, self.cell_size))
-                        img = pygame.image.load('bomb.png')
-                        img.convert()
-                        screen.blit(img, (b.get_x(), b.get_y() + 1))
+                            img = pygame.image.load("data\\bomb.png")
+                            img.convert()
+                            screen.blit(img, (b.get_x(), b.get_y()))
                     else:
-                        pygame.draw.rect(screen, (126, 126, 126), (b.get_x(), b.get_y(), self.cell_size, self.cell_size), 0)
-                        for i in range(4):
-                            pygame.draw.rect(screen, (193, 193, 193), (b.get_x() - i, b.get_y() - i, self.cell_size + 1, self.cell_size + 1), 1)
+                        img = pygame.image.load("data\\closed_cell.png")
+                        img.convert()
+                        screen.blit(img, (b.get_x(), b.get_y()))
                 else:
                     if b.get_open():
-                        pygame.draw.rect(screen, "white", (b.get_x(), b.get_y(), self.cell_size, self.cell_size), 0)
-                        for i in range(4):
-                            pygame.draw.rect(screen, (193, 193, 193), (b.get_x() - i, b.get_y() - i, self.cell_size + 1, self.cell_size + 1), 1)
                         if b.get_number() > 0:
-                            screen.blit(self.font.render(str(b.get_number()), True, "black"), (b.get_x(), b.get_y()))
+                            screen.blit(self.font.render(str(b.get_number()), True, "white"), (b.get_x(), b.get_y()))
+                        else:
+                            img = pygame.image.load("data\\empty_cell.png")
+                            img.convert()
+                            screen.blit(img, (b.get_x(), b.get_y()))
                     else:
-                        pygame.draw.rect(screen, (126, 126, 126), (b.get_x(), b.get_y(), self.cell_size, self.cell_size), 0)
-                        for i in range(4):
-                            pygame.draw.rect(screen, (193, 193, 193), (b.get_x() - i, b.get_y() - i, self.cell_size + 1, self.cell_size + 1), 1)
+                        img = pygame.image.load("data\\closed_cell.png")
+                        img.convert()
+                        screen.blit(img, (b.get_x(), b.get_y()))
 
     def check_value(self, x, y):
         if x >= 0 and x <= self.width - 1 and y >= 0 and y <= self.hight - 1:
