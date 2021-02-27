@@ -80,8 +80,12 @@ class Cell:
     def get_flag(self):
         return self.is_flag
 
-    def set_flag(self, par):
-        self.is_flag = par
+    def set_flag(self):
+        if not self.is_open:
+            if self.is_flag:
+                self.is_flag = False
+            else:
+                self.is_flag = True
 
 
 class Board:
@@ -92,7 +96,6 @@ class Board:
         self.cell_size = 20
         self.beggining = beggining
         self.is_exploded = False
-        self.font = pygame.font.SysFont('Arial', 10)
         lisst = []
         for a in range(self.width):
             lisst1 = []
@@ -141,11 +144,7 @@ class Board:
     def right_mouse_click(self, pos):
         a = pos[0] // self.cell_size
         b = (pos[1] - self.beggining) // self.cell_size
-        if not self.list_of_cells[a][b].get_open():
-            if self.list_of_cells[a][b].get_flag():
-                self.list_of_cells[a][b].set_flag(False)
-            else:
-                self.list_of_cells[a][b].set_flag(True)
+        self.list_of_cells[a][b].set_flag()
 
     def render(self, screen):
         for a in self.list_of_cells:
@@ -227,7 +226,7 @@ if __name__ == '__main__':
     pygame.init()
     size = width, height = 1000, 1000
     screen = pygame.display.set_mode(size)
-    board = Board(16, 30, 99, 5)
+    board = Board(16, 30, 98, 5)
     running = True
     while running:
         for event in pygame.event.get():
