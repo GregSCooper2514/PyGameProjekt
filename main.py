@@ -1,4 +1,4 @@
-import random, pygame, os, sys
+import random, pygame, os
 os.chdir("C:\\Users\\Greg\\Downloads")
 
 
@@ -173,7 +173,9 @@ class Board:
                     img.convert()
                     screen.blit(img, (b.get_x(), b.get_y()))
                 if b.get_flag() and not b.get_bomb() and self.is_exploded:
-                    pass #бомба с крестом
+                    img = pygame.image.load("data\\not_a_bomb.png")
+                    img.convert()
+                    screen.blit(img, (b.get_x(), b.get_y()))
 
     def check_value(self, x, y):
         if x >= 0 and x <= self.width - 1 and y >= 0 and y <= self.hight - 1:
