@@ -137,6 +137,19 @@ class Board:
         b = (pos[1] - self.beggining) // self.cell_size
         self.list_of_cells[a][b].set_flag()
 
+    def both_mouse_click(self, pos):
+        a = pos[0] // self.cell_size
+        b = (pos[1] - self.beggining) // self.cell_size
+        flag_counter = 0
+        if self.list_of_cells[a][b].get_open() and self.list_of_cells[a][b].get_number() > 0:
+            for i in self.get_near_cells(a, b):
+                if i.get_flag():
+                    flag_counter += 1
+            if flag_counter == self.list_of_cells[a][b].get_number():
+                for i in self.get_near_cells(a, b):
+                    if not i.get_open() and not i.get_flag():
+                        self.open_area(i.get_a(), i.get_b())
+
     def render(self, screen):
         for a in self.list_of_cells:
             for b in a:
@@ -221,15 +234,30 @@ if __name__ == '__main__':
     screen = pygame.display.set_mode(size)
     board = Board(16, 30, 98, 5)
     running = True
+    left_mouse_down = False
+    right_mouse_down = False
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
-                    board.left_mouse_click(event.pos)
+                    left_mouse_down = True
+                    if right_mouse_down:
+                        board.both_mouse_click(event.pos)
+                    else:
+                        board.left_mouse_click(event.pos)
                 if event.button == 3:
-                    board.right_mouse_click(event.pos)
+                    right_mouse_down = True
+                    if left_mouse_down:
+                        board.both_mouse_click(event.pos)
+                    else:
+                        board.right_mouse_click(event.pos)
+            if event.type == pygame.MOUSEBUTTONUP:
+                if event.button == 1:
+                    left_mouse_down = False
+                if event.button == 3:
+                    right_mouse_down = False
         screen.fill("black")
         board.render(screen)
         pygame.display.flip()
