@@ -87,6 +87,7 @@ class Board:
         self.cell_size = 20
         self.beggining = beggining
         self.is_exploded = False
+        self.smile_location = (self.width * self.cell_size // 2) - 28
         lisst = []
         for a in range(self.width):
             lisst1 = []
@@ -151,6 +152,10 @@ class Board:
                         self.open_area(i.get_a(), i.get_b())
 
     def render(self, screen):
+        pygame.draw.rect(screen, (192, 192, 192, 255), (0, 0, self.width * self.cell_size, 36))
+        img = pygame.image.load("data\\normal_smile.png")
+        img.convert()
+        screen.blit(img, (self.smile_location, 4))
         for a in self.list_of_cells:
             for b in a:
                 if b.get_bomb():
@@ -232,7 +237,7 @@ if __name__ == '__main__':
     pygame.init()
     size = width, height = 1000, 1000
     screen = pygame.display.set_mode(size)
-    board = Board(16, 30, 98, 5)
+    board = Board(16, 30, 98, 36)
     running = True
     left_mouse_down = False
     right_mouse_down = False
