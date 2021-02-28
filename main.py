@@ -1,6 +1,7 @@
-import random, pygame, os
+import random, pygame, os, pygame_menu
+from pygame_menu import themes
 os.chdir("C:\\Users\\Greg\\Downloads")
-
+from pygame_menu import *
 
 class Cell:
     def __init__(self):
@@ -123,33 +124,42 @@ class Board:
         for i in self.get_near_cells(a, b):
             self.open_area(i.get_a(), i.get_b())
 
+    def smile_button(self, pos):
+        if pos[0] > self.smile_location and pos[0] < self.smile_location + 28 and pos[1] > 4 and pos[1] < 32:
+            return True
+        else:
+            return False
+
     def left_mouse_click(self, pos):
-        a = pos[0] // self.cell_size
-        b = (pos[1] - self.beggining) // self.cell_size
-        if not self.list_of_cells[a][b].get_open():
-            if self.list_of_cells[a][b].get_bomb():
-                self.list_of_cells[a][b].set_current()
-                self.is_exploded = True
-            else:
-                self.open_area(a, b)
+        if not self.is_exploded:
+            a = pos[0] // self.cell_size
+            b = (pos[1] - self.beggining) // self.cell_size
+            if not self.list_of_cells[a][b].get_open():
+                if self.list_of_cells[a][b].get_bomb():
+                    self.list_of_cells[a][b].set_current()
+                    self.is_exploded = True
+                else:
+                    self.open_area(a, b)
 
     def right_mouse_click(self, pos):
-        a = pos[0] // self.cell_size
-        b = (pos[1] - self.beggining) // self.cell_size
-        self.list_of_cells[a][b].set_flag()
+        if not self.is_exploded:
+            a = pos[0] // self.cell_size
+            b = (pos[1] - self.beggining) // self.cell_size
+            self.list_of_cells[a][b].set_flag()
 
     def both_mouse_click(self, pos):
-        a = pos[0] // self.cell_size
-        b = (pos[1] - self.beggining) // self.cell_size
-        flag_counter = 0
-        if self.list_of_cells[a][b].get_open() and self.list_of_cells[a][b].get_number() > 0:
-            for i in self.get_near_cells(a, b):
-                if i.get_flag():
-                    flag_counter += 1
-            if flag_counter == self.list_of_cells[a][b].get_number():
+        if not self.is_exploded:
+            a = pos[0] // self.cell_size
+            b = (pos[1] - self.beggining) // self.cell_size
+            flag_counter = 0
+            if self.list_of_cells[a][b].get_open() and self.list_of_cells[a][b].get_number() > 0:
                 for i in self.get_near_cells(a, b):
-                    if not i.get_open() and not i.get_flag():
-                        self.open_area(i.get_a(), i.get_b())
+                    if i.get_flag():
+                        flag_counter += 1
+                if flag_counter == self.list_of_cells[a][b].get_number():
+                    for i in self.get_near_cells(a, b):
+                        if not i.get_open() and not i.get_flag():
+                            self.open_area(i.get_a(), i.get_b())
 
     def render(self, screen):
         pygame.draw.rect(screen, (192, 192, 192, 255), (0, 0, self.width * self.cell_size, 36))
@@ -235,12 +245,8 @@ class Board:
                 lisst.append(self.list_of_cells[x][y])
         return lisst
 
-
-if __name__ == '__main__':
-    pygame.init()
-    size = width, height = 1000, 1000
-    screen = pygame.display.set_mode(size)
-    board = Board(16, 30, 98, 36)
+def main_game():
+    board = Board(16, 30, 98, beggining)
     a = pygame.image.load("data\\icon.ico")
     pygame.display.set_icon(a)
     pygame.display.set_caption("Minesweeper retro")
@@ -254,7 +260,7 @@ if __name__ == '__main__':
             if event.type == pygame.QUIT:
                 running = False
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if event.pos[1] > 36:
+                if event.pos[1] > beggining:
                     if event.button == 1:
                         left_mouse_down = True
                         if right_mouse_down:
@@ -267,12 +273,37 @@ if __name__ == '__main__':
                             board.both_mouse_click(event.pos)
                         else:
                             board.right_mouse_click(event.pos)
+                else:
+                    if event.button == 1:
+                        if board.smile_button(event.pos):
+                            board = Board(16, 30, 98, 36)
+                        else:
+                            pass
             if event.type == pygame.MOUSEBUTTONUP:
                 if event.button == 1:
                     left_mouse_down = False
                 if event.button == 3:
                     right_mouse_down = False
+            if menu.is_enabled():
+                menu.draw(screen)
         screen.fill("black")
         board.render(screen)
         pygame.display.flip()
     pygame.quit()
+
+
+if __name__ == '__main__':
+    pygame.init()
+    size = width, height = 500, 500
+    beggining = 36
+    screen = pygame.display.set_mode(size)
+    pygame.display.set_icon(pygame.image.load("data\\icon.ico"))
+    pygame.display.set_caption("Minesweeper retro")
+    font = pygame_menu.font.FONT_8BIT
+    my_theme = themes.Theme(title_bar_style=pygame_menu.widgets.MENUBAR_STYLE_UNDERLINE, title_font_color=(254, 255, 3), title_font = font, background_color=(192, 192, 192))
+    menu = pygame_menu.Menu(500, 500, 'Choose', theme=my_theme)
+    menu.add_text_input("Width:", align=pygame_menu.locals.ALIGN_LEFT)
+    menu.add_text_input("Hight:", align=pygame_menu.locals.ALIGN_LEFT)
+    menu.add_text_input("Bombs:", align=pygame_menu.locals.ALIGN_LEFT)
+    menu.add_button('Play', main_game)
+    menu.mainloop(screen)
