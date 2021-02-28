@@ -160,6 +160,9 @@ class Board:
             for b in a:
                 if b.get_bomb():
                     if self.is_exploded:
+                        img = pygame.image.load("data\\dead_smile.png")
+                        img.convert()
+                        screen.blit(img, (self.smile_location, 4))
                         if b.get_current():
                             img = pygame.image.load("data\\current_bomb.png")
                             img.convert()
@@ -238,26 +241,32 @@ if __name__ == '__main__':
     size = width, height = 1000, 1000
     screen = pygame.display.set_mode(size)
     board = Board(16, 30, 98, 36)
+    a = pygame.image.load("data\\icon.ico")
+    pygame.display.set_icon(a)
+    pygame.display.set_caption("Minesweeper retro")
     running = True
     left_mouse_down = False
     right_mouse_down = False
     while running:
+        size = width, height
+        screen = pygame.display.set_mode(size)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if event.button == 1:
-                    left_mouse_down = True
-                    if right_mouse_down:
-                        board.both_mouse_click(event.pos)
-                    else:
-                        board.left_mouse_click(event.pos)
-                if event.button == 3:
-                    right_mouse_down = True
-                    if left_mouse_down:
-                        board.both_mouse_click(event.pos)
-                    else:
-                        board.right_mouse_click(event.pos)
+                if event.pos[1] > 36:
+                    if event.button == 1:
+                        left_mouse_down = True
+                        if right_mouse_down:
+                            board.both_mouse_click(event.pos)
+                        else:
+                            board.left_mouse_click(event.pos)
+                    if event.button == 3:
+                        right_mouse_down = True
+                        if left_mouse_down:
+                            board.both_mouse_click(event.pos)
+                        else:
+                            board.right_mouse_click(event.pos)
             if event.type == pygame.MOUSEBUTTONUP:
                 if event.button == 1:
                     left_mouse_down = False
