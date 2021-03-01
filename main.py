@@ -1,8 +1,6 @@
 import random
 import pygame
-import os
 from pygame_menu import *
-os.chdir("C:\\Users\\Greg\\Downloads")
 
 
 class Cell:
