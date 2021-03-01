@@ -1,7 +1,9 @@
-import random, pygame, os, pygame_menu
-from pygame_menu import themes
-os.chdir("C:\\Users\\Greg\\Downloads")
+import random
+import pygame
+import os
 from pygame_menu import *
+os.chdir("C:\\Users\\Greg\\Downloads")
+
 
 class Cell:
     def __init__(self):
@@ -245,11 +247,9 @@ class Board:
                 lisst.append(self.list_of_cells[x][y])
         return lisst
 
+
 def main_game():
-    board = Board(16, 30, 98, beggining)
-    a = pygame.image.load("data\\icon.ico")
-    pygame.display.set_icon(a)
-    pygame.display.set_caption("Minesweeper retro")
+    board = Board(cell_width, cell_hight, cell_bombs, beggining)
     running = True
     left_mouse_down = False
     right_mouse_down = False
@@ -276,7 +276,7 @@ def main_game():
                 else:
                     if event.button == 1:
                         if board.smile_button(event.pos):
-                            board = Board(16, 30, 98, 36)
+                            board = Board(cell_width, cell_hight, cell_bombs, beggininga)
                         else:
                             pass
             if event.type == pygame.MOUSEBUTTONUP:
@@ -292,18 +292,66 @@ def main_game():
     pygame.quit()
 
 
+def set_width(value):
+    global width, cell_size, cell_width
+    width = int(value) * cell_size
+    cell_width = int(value)
+
+
+def set_height(value):
+    global height, cell_size, beggining, cell_hight
+    height = int(value) * cell_size + beggining
+    cell_hight = int(value)
+
+
+def set_bombs(value):
+    global cell_bombs
+    cell_bombs = int(value)
+
+
+def set_difficulty(value, number):
+    global cell_bombs, height, cell_size, beggining, cell_hight, width, cell_width
+    if number == 0:
+        width = 9 * cell_size
+        height = 9 * cell_size + beggining
+        cell_width = 9
+        cell_hight = 9
+        cell_bombs = 10
+    if number == 1:
+        width = 16 * cell_size
+        height = 16 * cell_size + beggining
+        cell_width = 16
+        cell_hight = 16
+        cell_bombs = 40
+    if number == 2:
+        width = 30 * cell_size
+        height = 16 * cell_size + beggining
+        cell_width = 30
+        cell_hight = 16
+        cell_bombs = 99
+
+
 if __name__ == '__main__':
     pygame.init()
     size = width, height = 500, 500
     beggining = 36
+    cell_size = 20
+    cell_width = 9
+    cell_hight = 9
+    cell_bombs = 10
     screen = pygame.display.set_mode(size)
     pygame.display.set_icon(pygame.image.load("data\\icon.ico"))
-    pygame.display.set_caption("Minesweeper retro")
+    pygame.display.set_caption("Very Bad Minesweeper")
     font = pygame_menu.font.FONT_8BIT
-    my_theme = themes.Theme(title_bar_style=pygame_menu.widgets.MENUBAR_STYLE_UNDERLINE, title_font_color=(254, 255, 3), title_font = font, background_color=(192, 192, 192))
-    menu = pygame_menu.Menu(500, 500, 'Choose', theme=my_theme)
-    menu.add_text_input("Width:", align=pygame_menu.locals.ALIGN_LEFT)
-    menu.add_text_input("Hight:", align=pygame_menu.locals.ALIGN_LEFT)
-    menu.add_text_input("Bombs:", align=pygame_menu.locals.ALIGN_LEFT)
+    my_theme = themes.Theme(title_bar_style=pygame_menu.widgets.MENUBAR_STYLE_UNDERLINE, title_font_color=(254, 255, 3), title_font=font, background_color=(192, 192, 192))
+    menu = pygame_menu.Menu(500, 500, 'Choose', theme=my_theme, center_content=False)
+    menu.add_selector("Difficulty",
+                  [("Beginner", 0),
+                   ("Intermediate", 1),
+                   ("Expert", 2)],
+                  onchange=set_difficulty, default=0)
+    menu.add_text_input("Width:    ", onchange=set_width, input_type="__pygame_menu_input_int__", align=pygame_menu.locals.ALIGN_LEFT)
+    menu.add_text_input("Height:    ", onchange=set_height, input_type="__pygame_menu_input_int__", align=pygame_menu.locals.ALIGN_LEFT)
+    menu.add_text_input("Bombs:    ", onchange=set_bombs, input_type="__pygame_menu_input_int__", align=pygame_menu.locals.ALIGN_LEFT)
     menu.add_button('Play', main_game)
     menu.mainloop(screen)
