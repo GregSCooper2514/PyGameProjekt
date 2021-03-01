@@ -78,8 +78,12 @@ class Cell:
         if not self.is_open:
             if self.is_flag:
                 self.is_flag = False
+                return -1
             else:
                 self.is_flag = True
+                return 1
+        else:
+            return 0
 
 
 class Board:
@@ -90,6 +94,7 @@ class Board:
         self.cell_size = 20
         self.beggining = beggining
         self.is_exploded = False
+        self.bombs_left = self.bombs
         self.smile_location = (self.width * self.cell_size // 2) - 28
         lisst = []
         for a in range(self.width):
@@ -147,7 +152,7 @@ class Board:
         if not self.is_exploded:
             a = pos[0] // self.cell_size
             b = (pos[1] - self.beggining) // self.cell_size
-            self.list_of_cells[a][b].set_flag()
+            self.bombs_left -=  self.list_of_cells[a][b].set_flag()
 
     def both_mouse_click(self, pos):
         if not self.is_exploded:
@@ -168,6 +173,8 @@ class Board:
         img = pygame.image.load("data\\normal_smile.png")
         img.convert()
         screen.blit(img, (self.smile_location, 4))
+        textsurface = myfont.render(str("%03d"%self.bombs_left), False, (255, 0, 0), (0, 0, 0))
+        screen.blit(textsurface, (self.width * self.cell_size - 60, 0))
         for a in self.list_of_cells:
             for b in a:
                 if b.get_bomb():
@@ -276,7 +283,7 @@ def main_game():
                 else:
                     if event.button == 1:
                         if board.smile_button(event.pos):
-                            board = Board(cell_width, cell_hight, cell_bombs, beggininga)
+                            board = Board(cell_width, cell_hight, cell_bombs, beggining)
                         else:
                             pass
             if event.type == pygame.MOUSEBUTTONUP:
@@ -333,25 +340,28 @@ def set_difficulty(value, number):
 
 if __name__ == '__main__':
     pygame.init()
-    size = width, height = 500, 500
+    size = width, height = 500, 300
     beggining = 36
     cell_size = 20
     cell_width = 9
     cell_hight = 9
     cell_bombs = 10
+    pygame.font.init()
+    myfont = pygame.font.SysFont('Comic Sans MS', 30)
     screen = pygame.display.set_mode(size)
     pygame.display.set_icon(pygame.image.load("data\\icon.ico"))
     pygame.display.set_caption("Very Bad Minesweeper")
     font = pygame_menu.font.FONT_8BIT
+    font1 = pygame_menu.font.FONT_OPEN_SANS_BOLD
     my_theme = themes.Theme(title_bar_style=pygame_menu.widgets.MENUBAR_STYLE_UNDERLINE, title_font_color=(254, 255, 3), title_font=font, background_color=(192, 192, 192))
-    menu = pygame_menu.Menu(500, 500, 'Choose', theme=my_theme, center_content=False)
+    menu = pygame_menu.Menu(300, 500, 'Choose', theme=my_theme, center_content=False)
     menu.add_selector("Difficulty",
                   [("Beginner", 0),
                    ("Intermediate", 1),
                    ("Expert", 2)],
-                  onchange=set_difficulty, default=0)
-    menu.add_text_input("Width:    ", onchange=set_width, input_type="__pygame_menu_input_int__", align=pygame_menu.locals.ALIGN_LEFT)
-    menu.add_text_input("Height:    ", onchange=set_height, input_type="__pygame_menu_input_int__", align=pygame_menu.locals.ALIGN_LEFT)
-    menu.add_text_input("Bombs:    ", onchange=set_bombs, input_type="__pygame_menu_input_int__", align=pygame_menu.locals.ALIGN_LEFT)
-    menu.add_button('Play', main_game)
+                  onchange=set_difficulty, default=0, font_name=pygame_menu.font.FONT_OPEN_SANS_BOLD)
+    menu.add_text_input("Width:    ", onchange=set_width, input_type="__pygame_menu_input_int__", align=pygame_menu.locals.ALIGN_LEFT, font_name=pygame_menu.font.FONT_OPEN_SANS_BOLD)
+    menu.add_text_input("Height:    ", onchange=set_height, input_type="__pygame_menu_input_int__", align=pygame_menu.locals.ALIGN_LEFT, font_name=pygame_menu.font.FONT_OPEN_SANS_BOLD)
+    menu.add_text_input("Bombs:    ", onchange=set_bombs, input_type="__pygame_menu_input_int__", align=pygame_menu.locals.ALIGN_LEFT, font_name=pygame_menu.font.FONT_OPEN_SANS_BOLD)
+    menu.add_button('Play', main_game, font_name=pygame_menu.font.FONT_OPEN_SANS_BOLD)
     menu.mainloop(screen)
