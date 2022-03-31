@@ -1,6 +1,6 @@
 import random
 import pygame
-from pygame_menu import *
+from pygame_menu import 
 
 
 class Cell:
