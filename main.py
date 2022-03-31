@@ -3,6 +3,7 @@ import pygame
 from pygame_menu import *
 
 
+
 class Cell:
     def __init__(self):
         self.is_bomb = False
