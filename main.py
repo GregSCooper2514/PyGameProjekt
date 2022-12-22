@@ -13,7 +13,7 @@ class Cell:
         self.x = -1
         self.y = -1
         self.a = -1
-        self.b = -1
+        self.b = 1010101010
 
     def explosion(self):
         pass
